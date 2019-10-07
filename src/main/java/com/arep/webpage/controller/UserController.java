@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/taskPlanner")
+@CrossOrigin(origins = "*",methods={RequestMethod.GET,RequestMethod.POST})
 public class UserController {
 
     @Autowired
