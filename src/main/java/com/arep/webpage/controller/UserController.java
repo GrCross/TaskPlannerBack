@@ -2,12 +2,15 @@ package com.arep.webpage.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.arep.webpage.config.Token;
+import com.arep.webpage.dao.TaskDAO;
 import com.arep.webpage.exceptions.NotFoundException;
 import com.arep.webpage.model.Task;
 import com.arep.webpage.model.User;
+import com.arep.webpage.service.TaskService;
 import com.arep.webpage.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,6 +28,8 @@ public class UserController {
 
     @Autowired
     UserService userService;
+    @Autowired
+    TaskService taskService;
 
     @RequestMapping( value = "/user/login", method = RequestMethod.POST )
     public Token login(@RequestBody User login )
@@ -41,20 +46,16 @@ public class UserController {
         String email = login.getEmail();
         String password = login.getPassword();
 
-        User user = userService.consultarUsuarioPorCorreo(email);
+        Optional<User> OptUser = userService.consultarUsuarioPorCorreo(email);
 
-        if ( user == null )
-        {
-            throw new ServletException( "User username not found." );
-        }
-
+        if ( !OptUser.isPresent() ) { throw new ServletException( "User username not found." ); }
+        User user = OptUser.get();
         String pwd = user.getPassword();
 
-        if ( !password.equals( pwd ) )
-        {
+        if ( !password.equals( pwd ) ) {
             throw new ServletException( "Invalid login. Please check your name and password." );
         }
-        //
+
         jwtToken = Jwts.builder().setSubject( email ).claim( "roles", "user" ).setIssuedAt( new Date() ).signWith(
                 SignatureAlgorithm.HS256, "secretkey" ).compact();
 
@@ -75,7 +76,8 @@ public class UserController {
     public ResponseEntity<User> recursoConsultarUsuarioPorCorreo(@PathVariable String email)
             throws NotFoundException {
         try {
-            User usuario = userService.consultarUsuarioPorCorreo(email);
+            Optional<User> OptUser = userService.consultarUsuarioPorCorreo(email);
+            User usuario = OptUser.get();
             return new ResponseEntity<>(usuario, HttpStatus.OK);
         } catch (Exception ex) {
             throw new NotFoundException(ex.getMessage());
@@ -85,10 +87,12 @@ public class UserController {
     @RequestMapping(value = "/users/{email}/tasks", method = RequestMethod.GET)
     public ResponseEntity<List<Task>> recursoConsultarTasksUsuarioPorCorreo(@PathVariable String email)
             throws NotFoundException {
+        System.out.println(email);
         try {
-            List<Task> tasks = userService.consultarTasksPorCorreo(email);
+            List<Task> tasks = taskService.consultarTasksPorCorreo(email);
             return new ResponseEntity<>(tasks, HttpStatus.OK);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new NotFoundException(ex.getMessage());
         }
     }
@@ -97,8 +101,9 @@ public class UserController {
     public ResponseEntity<Task> recursoConsultarTaskUsuarioPorCorreoId(@PathVariable String email,@PathVariable Integer id)
             throws NotFoundException {
         try {
-            Task task = userService.consultarTaskPorIdCorreo(email,id);
-            return new ResponseEntity<>(task, HttpStatus.OK);
+            Optional<Task> OptTask = taskService.consultarTaskPorIdCorreo(email,id);
+            Task task = OptTask.get();
+            return new ResponseEntity<Task>(task, HttpStatus.OK);
         } catch (Exception ex) {
             throw new NotFoundException(ex.getMessage());
         }
@@ -122,7 +127,7 @@ public class UserController {
     @RequestMapping(value = "/users/{email}/tasks", method = RequestMethod.POST)
     public ResponseEntity<?> recursoCrearTask(@PathVariable String email, @RequestBody Task task) {
         try {
-            userService.agregarTask(email,task);
+            taskService.insertarTask(email,task);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception ex) {
             ex.printStackTrace();

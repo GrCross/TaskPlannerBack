@@ -4,15 +4,16 @@ import com.arep.webpage.model.Task;
 
 
 import java.util.List;
+import java.util.Optional;
 
 /**
- * La clase SchiNotesService representa los servicios que se pueden ofrecer.
+ *
  */
 public interface TaskService {
 
-
-    public Task consultarTasksPorCorreo(String email) ;
-    public List<Task> consultarTaskPorIdCorreo(String email,Integer id);
-
+    public List<Task> consultarTasks();
+    public List<Task> consultarTasksPorCorreo(String email) ;
+    public Optional<Task> consultarTaskPorIdCorreo(String email,Integer id);
+    public void insertarTask(String email,Task task);
 
 }

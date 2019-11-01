@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -16,33 +17,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> consultarUsuarios() {
-        return userDAO.loadAll();
+        return userDAO.findAll();
     }
 
     @Override
-    public User consultarUsuarioPorCorreo(String correo) {
-        return userDAO.loadUserByEmail(correo);
+    public Optional<User> consultarUsuarioPorCorreo(String correo) {
+        return userDAO.findById(correo);
     }
 
     @Override
-    public List<Task> consultarTasksPorCorreo(String email) {
-        
-        return userDAO.loadTasksUser(email);
-    }
+    public void agregarUsuario(User user) { userDAO.insert(user); }
 
-    @Override
-    public Task consultarTaskPorIdCorreo(String email, Integer id) {
-        return userDAO.loadTaskUser(email, id);
-    }
-
-    @Override
-    public void agregarUsuario(User user) {
-        userDAO.addUser(user);
-
-    }
-
-    @Override
-    public void agregarTask(String email, Task task) {
-        userDAO.addTask(email, task);
-    }
 }

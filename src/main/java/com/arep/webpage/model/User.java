@@ -1,14 +1,18 @@
 package com.arep.webpage.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.ArrayList;
 import java.util.List;
-
+@Document
 public class User {
 
-    public String name;
+    @Id
     public String email;
+
+    public String name;
     public String password;
-    public List<Task> tasks = new ArrayList<>();;
 
     public User(String name, String email, String password) {
         this.name = name;
@@ -19,9 +23,6 @@ public class User {
 
     }
 
-    public void addTask(Task task){
-        tasks.add(task);
-    }
     public String getName() {
         return name;
     }
@@ -45,12 +46,5 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    
-    public List<Task> getTasks() {
-        return this.tasks;
-    }
 
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
-    }
 }
