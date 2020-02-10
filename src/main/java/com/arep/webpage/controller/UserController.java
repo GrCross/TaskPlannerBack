@@ -35,7 +35,6 @@ public class UserController {
     public Token login(@RequestBody User login )
             throws ServletException
     {
-        System.out.println(login);
         String jwtToken = "";
 
         if ( login.getEmail() == null || login.getPassword() == null )
@@ -47,7 +46,6 @@ public class UserController {
         String password = login.getPassword();
 
         Optional<User> OptUser = userService.consultarUsuarioPorCorreo(email);
-
         if ( !OptUser.isPresent() ) { throw new ServletException( "User username not found." ); }
         User user = OptUser.get();
         String pwd = user.getPassword();
